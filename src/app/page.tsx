@@ -52,7 +52,7 @@ export default function Formulario() {
           return;
         }
         message.success("Formulario enviado correctamente.");
-        router.push(`/requirements/${r.data.requirement._id}`);
+        router.push(`/requirements/details?id=${r.data.requirement._id}`);
       })
       .catch((err) => {
         console.error("--err");

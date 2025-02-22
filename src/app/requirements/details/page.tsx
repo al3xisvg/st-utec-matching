@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Flex, message, Spin, Tooltip } from "antd";
 
 import ApiService, {
@@ -11,9 +11,9 @@ import ApiService, {
 
 import "@ant-design/v5-patch-for-react-19";
 
-// http://52.54.162.97:5000/api/obtain/requirement-with-products/67b92456a2bc301ace692366
 const RequirementDetails = () => {
-  const params = useParams();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const router = useRouter();
   const [requirement, setRequirement] = useState<IRequirementDB>({
     _id: "",
@@ -39,8 +39,8 @@ const RequirementDetails = () => {
   };
 
   useEffect(() => {
-    if (params.id) {
-      ApiService.obtainRequirement(params.id.toString())
+    if (id) {
+      ApiService.obtainRequirement(id.toString())
         .then((r) => {
           if (!r?.data) {
             message.error("ocurrio un error.");
@@ -57,7 +57,7 @@ const RequirementDetails = () => {
         })
         .finally(() => setLoading(false));
     }
-  }, [params.id]);
+  }, [id]);
 
   return (
     <div className="container mx-auto p-6">

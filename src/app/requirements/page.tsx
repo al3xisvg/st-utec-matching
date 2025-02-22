@@ -59,7 +59,7 @@ const ListadoPage = () => {
                   <Button
                     type="primary"
                     onClick={() =>
-                      router.push(`/requirements/${requirement._id}`)
+                      router.push(`/requirements/details?id=${requirement._id}`)
                     }
                   >
                     Ir al detalle
