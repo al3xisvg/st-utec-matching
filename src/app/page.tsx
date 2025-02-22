@@ -1,101 +1,171 @@
-import Image from "next/image";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import {
+  Form,
+  Input,
+  Button,
+  Table,
+  Card,
+  message,
+  Typography,
+  Flex,
+} from "antd";
+
+import ApiService from "@/api/restful";
+
+import "@ant-design/v5-patch-for-react-19";
+
+export default function Formulario() {
+  const [form] = Form.useForm();
+  const [productForm] = Form.useForm();
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(false);
+
+  const handleAddProduct = (values: any) => {
+    setProducts([...products, { key: Date.now(), ...values }]);
+    productForm.resetFields();
+  };
+
+  const handleSubmit = (values: any) => {
+    if (products.length === 0) {
+      message.error("Agrega al menos un producto antes de enviar.");
+      return;
+    }
+
+    values.nombre = values.titulo;
+    const formData = { ...values, productos: products };
+    console.log("Formulario enviado:", formData);
+
+    setLoading(true);
+    ApiService.createRequirement(formData)
+      .then((r) => {
+        console.log("--r--");
+        console.log(r);
+        message.success("Formulario enviado correctamente.");
+      })
+      .catch((err) => {
+        console.error("--err");
+        console.log(err);
+        message.error("Formulario enviado fallo.");
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const columns = [
+    {
+      title: "Nombre Producto",
+      dataIndex: "nombre",
+      key: "nombreProducto",
+    },
+    {
+      title: "Unidad de Medida",
+      dataIndex: "unidad",
+      key: "unidadMedida",
+    },
+    { title: "Cantidad", dataIndex: "cantidad", key: "cantidad" },
+    { title: "Marca", dataIndex: "marca", key: "marca" },
+  ];
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div
+      style={{
+        padding: 20,
+        background: "#141414",
+        minHeight: "100vh",
+        color: "#fff",
+      }}
+    >
+      <Typography.Title style={{ color: "#fff" }}>
+        Formulario de Productos
+      </Typography.Title>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      {/* Sección 1: Datos Principales */}
+      <Card style={{ background: "#1f1f1f", marginBottom: 20 }}>
+        <Form form={form} onFinish={handleSubmit} layout="horizontal">
+          <Typography.Title level={4} style={{ color: "#fff" }}>
+            Información General
+          </Typography.Title>
+          <Form.Item
+            name="titulo"
+            label={<span style={{ color: "#fff" }}>Nombre</span>}
+            rules={[{ required: true }]}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="codigo"
+            label={<span style={{ color: "#fff" }}>Código</span>}
+            rules={[{ required: true }]}
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+            <Input />
+          </Form.Item>
+        </Form>
+      </Card>
+
+      {/* Sección 2: Agregar Productos */}
+      <Card style={{ background: "#1f1f1f", marginBottom: 20 }}>
+        <Typography.Title level={4} style={{ color: "#fff" }}>
+          Agregar Productos
+        </Typography.Title>
+        <Form
+          form={productForm}
+          onFinish={handleAddProduct}
+          layout="horizontal"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <Form.Item
+            name="nombre"
+            label={<span style={{ color: "#fff" }}>Nombre de Producto</span>}
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Flex justify="space-between">
+            <Form.Item
+              name="unidad"
+              label={<span style={{ color: "#fff" }}>Unidad de Medida</span>}
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="cantidad"
+              label={<span style={{ color: "#fff" }}>Cantidad</span>}
+              rules={[{ required: true }]}
+            >
+              <Input type="number" />
+            </Form.Item>
+            <Form.Item
+              name="marca"
+              label={<span style={{ color: "#fff" }}>Marca</span>}
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+          </Flex>
+          <Button loading={isLoading} type="primary" htmlType="submit">
+            Agregar Producto
+          </Button>
+        </Form>
+      </Card>
+
+      {/* Tabla de Productos */}
+      <Table
+        dataSource={products}
+        columns={columns}
+        style={{ background: "#222" }}
+      />
+
+      {/* Botón Final para Enviar */}
+      <Button
+        type="primary"
+        loading={isLoading}
+        onClick={() => form.submit()}
+        style={{ marginTop: 20 }}
+      >
+        Enviar Formulario
+      </Button>
     </div>
   );
 }

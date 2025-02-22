@@ -1,0 +1,67 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button, Spin, Table } from "antd";
+
+export default function OrderDetail({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [matchedInventory, setMatchedInventory] = useState<any[]>([]);
+
+  const handleMatchInventory = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setMatchedInventory([
+        {
+          key: "1",
+          nombre: "Producto A",
+          unidad: "kg",
+          cantidad: 10,
+          marca: "Marca X",
+          inventario: "Disponible",
+          similitud: "90%",
+        },
+        {
+          key: "2",
+          nombre: "Producto B",
+          unidad: "lt",
+          cantidad: 5,
+          marca: "Marca Y",
+          inventario: "Bajo Stock",
+          similitud: "75%",
+        },
+      ]);
+      setLoading(false);
+    }, 3000);
+  };
+
+  const columns = [
+    { title: "Nombre Producto", dataIndex: "nombre", key: "nombre" },
+    { title: "Unidad de Medida", dataIndex: "unidad", key: "unidad" },
+    { title: "Cantidad", dataIndex: "cantidad", key: "cantidad" },
+    { title: "Marca", dataIndex: "marca", key: "marca" },
+    { title: "Inventario Matched", dataIndex: "inventario", key: "inventario" },
+    {
+      title: "Porcentaje de Similitud",
+      dataIndex: "similitud",
+      key: "similitud",
+    },
+  ];
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h2>Detalle del Pedido {params.id}</h2>
+      <Button type="primary" onClick={handleMatchInventory} disabled={loading}>
+        {loading ? <Spin /> : "Match Inventarios"}
+      </Button>
+      {matchedInventory.length > 0 && (
+        <Table
+          dataSource={matchedInventory}
+          columns={columns}
+          style={{ marginTop: 20 }}
+        />
+      )}
+    </div>
+  );
+}
