@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Form,
   Input,
@@ -18,6 +19,7 @@ import ApiService from "@/api/restful";
 import "@ant-design/v5-patch-for-react-19";
 
 export default function Formulario() {
+  const router = useRouter();
   const [form] = Form.useForm();
   const [productForm] = Form.useForm();
   const [products, setProducts] = useState<any[]>([]);
@@ -43,7 +45,14 @@ export default function Formulario() {
       .then((r) => {
         console.log("--r--");
         console.log(r);
+        if (!r?.data) {
+          console.error("--err");
+          console.log(r?.message);
+          message.error("Formulario enviado fallo.");
+          return;
+        }
         message.success("Formulario enviado correctamente.");
+        router.push(`/requirements/${r.data.requirement._id}`);
       })
       .catch((err) => {
         console.error("--err");

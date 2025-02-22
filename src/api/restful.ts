@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosInstance } from "axios";
 
 import config from "@/config/app";
 
-interface IRequirementDB {
+export interface IRequirementDB {
   _id: string;
   nombre: string;
   codigo: string;
@@ -12,7 +11,7 @@ interface IRequirementDB {
   __v: number;
 }
 
-interface IProductDB {
+export interface IProductDB {
   _id: string;
   nombre: string;
   unidad: string;
@@ -24,12 +23,18 @@ interface IProductDB {
   __v: number;
 }
 
-interface ResponseCreateReq {
+export interface IProductMatched extends IProductDB {
+  similarity: number;
+  inventoryName: string;
+  inventoryId: string;
+}
+
+export interface ReqDetails {
   message?: string | undefined;
   success?: boolean | undefined;
   data?: {
     requirement: IRequirementDB;
-    products: IProductDB;
+    products: IProductDB[];
   };
 }
 
@@ -58,16 +63,42 @@ class ApiService {
 
   createRequirement = async (
     requirement: IRequirement
-  ): Promise<ResponseCreateReq | null> => {
+  ): Promise<ReqDetails | null> => {
     try {
       const response = await this.service.post(
         "/create/requirement-with-products",
         requirement
       );
-      const res: ResponseCreateReq = response.data;
+      const res: ReqDetails = response.data;
       return res;
     } catch (error) {
       console.error("createRequirement - creatWithProducts", error);
+      return null;
+    }
+  };
+
+  listRequirements = async (): Promise<IRequirementDB[] | null> => {
+    try {
+      const response = await this.service.get(`/list/requirements`);
+      const res: IRequirementDB[] = response.data.data.requirementsDB;
+      return res;
+    } catch (error) {
+      console.error("listRequirements", error);
+      return null;
+    }
+  };
+
+  obtainRequirement = async (
+    requirementId: string
+  ): Promise<ReqDetails | null> => {
+    try {
+      const response = await this.service.get(
+        `/obtain/requirement-with-products/${requirementId}`
+      );
+      const res: ReqDetails = response.data;
+      return res;
+    } catch (error) {
+      console.error("obtainRequirement - listWith Products", error);
       return null;
     }
   };
